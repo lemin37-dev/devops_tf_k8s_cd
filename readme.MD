@@ -104,20 +104,81 @@ tf-k8s-cd/
     ```
       aws ecr describe-repositories --region ap-northeast-1  --query "repositories[].{Name:repositoryName,URI:repositoryUri}"  --output table
     ```
+- 점검
+    - 태그 확인
+        ```
+        # --repository-name [ECR_NAME]
+        aws ecr describe-images  --repository-name "de-ai-19-devops-tf-eks-auto-dev/web"  --image-ids imageTag=dev-latest  --region ap-northeast-1  --query "imageDetails[0].imageTags"  --output json
+        aws ecr describe-images  --repository-name "de-ai-19-devops-tf-eks-auto-dev/was"  --image-ids imageTag=dev-latest  --region ap-northeast-1  --query "imageDetails[0].imageTags"  --output json
+        ```
+    - kustomization.yaml 점검
+        ```
+        # 오류없이 출력되면 문제없음
+        kubectl kustomize k8s/overlays/dev
+        ```
+    - kustomization.yaml git 비교
+        ```
+        git diff -- k8s/overlays/dev/kustomization.yaml
+        ```
+    - Github Actions 작동여부 확인
+        ```
+        # .github/workflows/validation.yml에 작성된 path의 파일수정 후 push하여 git action 작동 확인
+        ```
 
-# 점검
-- 태그 확인
+- 로컬 PC의 kubectl과 EKS 클러스터 연결
     ```
-    # --repository-name [ECR_NAME]
-    aws ecr describe-images  --repository-name "de-ai-19-devops-tf-eks-auto-dev/web"  --image-ids imageTag=dev-latest  --region ap-northeast-1  --query "imageDetails[0].imageTags"  --output json
-    aws ecr describe-images  --repository-name "de-ai-19-devops-tf-eks-auto-dev/was"  --image-ids imageTag=dev-latest  --region ap-northeast-1  --query "imageDetails[0].imageTags"  --output json
+    # EKS 클러스터명 조회
+    aws eks list-clusters --region ap-northeast-1 --output table
+    -----
+    [output]
+    de-ai-19-devops-tf-eks-auto-dev
+
+    # 연결
+    aws eks update-kubeconfig --region ap-northeast-1 --name de-ai-19-devops-tf-eks-auto-dev
+
+    # kubectl이 실제 접근 가능한 클러스터 목록
+    kubectl get namespace
+
+    # ingress, ALB 주소 체크
+    kubectl get ingress -n de-ai-19
     ```
-- kustomization.yaml 점검
+
+- ArgoCD 설치
     ```
-    # 오류없이 출력되면 문제없음
-    kubectl kustomize k8s/overlays/dev
+    # 설치
+    .\scripts\bootstrap-cd.bat lemin37-dev/devops_tf_k8s_cd
+
+    # ArgoCD 상태확인
+    kubectl get pod -n argocd
+
+    # ArgoCD와 Github 연결상태 확인
+    kubectl get applications -n argocd
     ```
-- kustomization.yaml git 비교
+
+- 현재 상태 체크
     ```
-    git diff -- k8s/overlays/dev/kustomization.yaml
+    # 생성된 pod 확인
+    kubectl get pods -A
+
+    # Ingress, ALB 주소 체크
+    kubectl get ingress -n de-ai-19
+
+    # 현재 클러스터에 배포된 이미지 확인
+    kubectl get deployment web was  -n de-ai-19  -o jsonpath="{range .items[*]}{.metadata.name}{': '}{.spec.template.spec.containers[0].image}{'\n'}{end}"
+    ```
+
+- ci repository의 ci.yaml jobs 중 update-cd 주석 해제
+    - 아래 2개 변수 설정
+        - CD_REPOSITORY
+            ```
+              gh variable set CD_REPOSITORY --repo lemin37-dev/devops_tf_k8s_ci --body "lemin37-dev/devops_tf_k8s_cd"
+            ```
+        - CD_REPOSITORY_TOKEN
+            ```
+              gh auth token | gh secret set CD_REPOSITORY_TOKEN --repo lemin37-dev/devops_tf_k8s_ci
+            ```
+
+# ArgoCD 대시보드
+    ```
+    .\scripts\open-argocd.bat
     ```
