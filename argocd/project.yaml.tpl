@@ -1,16 +1,16 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: de-ai-25
+  name: de-ai-19
   namespace: argocd
 spec:
-  description: DE-AI-25 EKS Auto Mode WEB/WAS project
+  description: DE-AI-19 EKS Auto Mode WEB/WAS project
 
   sourceRepos:
     - "__CD_REPO_URL__"
 
   destinations:
-    - namespace: de-ai-25
+    - namespace: de-ai-19
       server: https://kubernetes.default.svc
 
   clusterResourceWhitelist:

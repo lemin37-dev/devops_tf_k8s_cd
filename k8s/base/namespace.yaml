@@ -1,9 +1,9 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: de-ai-25
+  name: de-ai-19
   annotations:
     argocd.argoproj.io/sync-wave: "-4"
   labels:
-    app.kubernetes.io/part-of: de-ai-25
+    app.kubernetes.io/part-of: de-ai-19
     environment: dev

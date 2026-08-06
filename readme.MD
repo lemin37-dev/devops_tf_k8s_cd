@@ -3,16 +3,16 @@
 - EKS (Auto Mode) 환경의 WEB/WAS 애플리케이션을 ArgoCD로 배포하는 GitOps CD 저장소
     - 제품 : ArgoCD, Flux, ...
     - 특정 내용이 변경되면 트리거가 작동되어 배포
-        -> Kustomization.yaml : ArgoCD가 계속 모니터링 하는 파일로 CI 작업으로 인해 변경되면 CD가 작동되는 방식
+        -> kustomization.yaml : ArgoCD가 계속 모니터링 하는 파일로 CI 작업으로 인해 변경되면 CD가 작동되는 방식
 - 간단 workflow
     ```
-    Github Actions Push -> ... -> Kustomization.yaml 수정 
+    Github Actions Push -> ... -> kustomization.yaml 수정 
     -> ArgoCD 감지 -> ... -> Pod 순차 교체 (배포) -> 서비스 업데이트 (무중단 배포)
     ```
 
 # 전체 workflow
-- ArgoCD는 `k8s/overlays/dev` 경로의 yaml 파일(Kustomization.yaml) 감시
-- CI는 ECR에 업로드된 이미지 태그를 Kustomization.yaml에 기록
+- ArgoCD는 `k8s/overlays/dev` 경로의 yaml 파일(kustomization.yaml) 감시
+- CI는 ECR에 업로드된 이미지 태그를 kustomization.yaml에 기록
 - 이미지 태그의 변경(내용변경)을 확인하여 CD를 진행
     ```
     개발자 Push
@@ -90,3 +90,34 @@ tf-k8s-cd/
  ├─ setup-ci-cd-link.sh
  └─ update_images.py             : .tpl 형식으로 작성된 Argo CD 템플릿을 실제 YAML 파일로 변환
 ```
+
+# ArgoCD
+- ArgoCD가 어떤 방식으로 쿠버네티스 리소스를 배포할지 정의
+- 세부
+    - argocd/application.yaml.tpl : 애플리케이션 리소스 정의, 쿠버네티스 배포 위치 지정, 실제 감시할 위치 지정 / 실제 배포 작업 정의
+    - argocd/project.yaml.tpl : 애플리케이션 논리적 구분, 배포 권한 제한 선언, ECR 정보 등 참조
+    - argocd/monitoring-application.yaml.tpl : 프로메테우스, 그라파나 등 모니터링 관련 설정 (CD와 관계 X)
+
+# 세팅
+- kustomization.yaml 1회 수동 수정
+    - ECR 주소 확인
+    ```
+      aws ecr describe-repositories --region ap-northeast-1  --query "repositories[].{Name:repositoryName,URI:repositoryUri}"  --output table
+    ```
+
+# 점검
+- 태그 확인
+    ```
+    # --repository-name [ECR_NAME]
+    aws ecr describe-images  --repository-name "de-ai-19-devops-tf-eks-auto-dev/web"  --image-ids imageTag=dev-latest  --region ap-northeast-1  --query "imageDetails[0].imageTags"  --output json
+    aws ecr describe-images  --repository-name "de-ai-19-devops-tf-eks-auto-dev/was"  --image-ids imageTag=dev-latest  --region ap-northeast-1  --query "imageDetails[0].imageTags"  --output json
+    ```
+- kustomization.yaml 점검
+    ```
+    # 오류없이 출력되면 문제없음
+    kubectl kustomize k8s/overlays/dev
+    ```
+- kustomization.yaml git 비교
+    ```
+    git diff -- k8s/overlays/dev/kustomization.yaml
+    ```

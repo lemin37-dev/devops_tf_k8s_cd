@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-APP_NAMESPACE="${APP_NAMESPACE:-de-ai-25}"
+APP_NAMESPACE="${APP_NAMESPACE:-de-ai-19}"
 
 echo "============================================================"
 echo "Argo CD Application"
 echo "============================================================"
-kubectl get application de-ai-25 -n argocd -o wide
+kubectl get application de-ai-19 -n argocd -o wide
 
 echo
 echo "============================================================"
