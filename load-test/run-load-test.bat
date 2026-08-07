@@ -1,4 +1,3 @@
-```bat
 @echo off
 setlocal EnableExtensions DisableDelayedExpansion
 
@@ -71,4 +70,3 @@ if "%RESULT%"=="0" (
 
 endlocal
 exit /b %RESULT%
-```

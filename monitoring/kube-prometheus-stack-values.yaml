@@ -25,6 +25,42 @@ grafana:
     datasources:
       enabled: true
 
+    # 그라파나 환경변수 (DB 연결)
+  extraEnv:
+  - name: GF_DATABASE_TYPE
+    value: mysql
+
+  - name: GF_DATABASE_HOST
+    valueFrom:
+      secretKeyRef:
+        name: rds-secret
+        key: host
+
+  - name: GF_DATABASE_NAME
+    valueFrom:
+      secretKeyRef:
+        name: rds-secret
+        key: database
+
+  - name: GF_DATABASE_USER
+    valueFrom:
+      secretKeyRef:
+        name: rds-secret
+        key: username
+
+  - name: GF_DATABASE_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: rds-secret
+        key: password
+  grafana.ini:
+    database:
+      type: mysql
+      host: ${GF_DATABASE_HOST}
+      name: ${GF_DATABASE_NAME}
+      user: ${GF_DATABASE_USER}
+      password: ${GF_DATABASE_PASSWORD}
+
   # 실습용 기본 관리자 계정이다.
   # 비밀번호는 Chart가 생성한 Secret에서 조회하며 Git에 평문으로 저장하지 않는다.
   adminUser: admin

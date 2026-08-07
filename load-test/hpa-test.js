@@ -15,8 +15,8 @@ export const options = {
   // VU(Virtual User)를 단계적으로 증가시킨 후 0으로 줄인다.
   stages: [
     { duration: '30s', target: 10 },  // 준비 단계: 사용자 10명까지 증가
-    { duration: '2m', target: 50 },   // 부하 증가: 사용자 50명 유지
-    { duration: '3m', target: 100 },  // 확장 관찰: 사용자 100명 유지
+    { duration: '2m', target: 100 },   // 부하 증가: 사용자 50명 유지
+    { duration: '3m', target: 200 },  // 확장 관찰: 사용자 100명 유지
     { duration: '1m', target: 0 },    // 종료 단계: 트래픽을 점진적으로 제거
   ],
 
