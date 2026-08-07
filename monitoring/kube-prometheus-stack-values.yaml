@@ -25,34 +25,34 @@ grafana:
     datasources:
       enabled: true
 
-    # 그라파나 환경변수 (DB 연결)
+  # 그라파나 환경변수 (DB 연결)
   extraEnv:
-  - name: GF_DATABASE_TYPE
-    value: mysql
+    - name: GF_DATABASE_TYPE
+      value: mysql
 
-  - name: GF_DATABASE_HOST
-    valueFrom:
-      secretKeyRef:
-        name: rds-secret
-        key: host
+    - name: GF_DATABASE_HOST
+      valueFrom:
+        secretKeyRef:
+          name: rds-secret
+          key: host
 
-  - name: GF_DATABASE_NAME
-    valueFrom:
-      secretKeyRef:
-        name: rds-secret
-        key: database
+    - name: GF_DATABASE_NAME
+      valueFrom:
+        secretKeyRef:
+          name: rds-secret
+          key: database
 
-  - name: GF_DATABASE_USER
-    valueFrom:
-      secretKeyRef:
-        name: rds-secret
-        key: username
+    - name: GF_DATABASE_USER
+      valueFrom:
+        secretKeyRef:
+          name: rds-secret
+          key: username
 
-  - name: GF_DATABASE_PASSWORD
-    valueFrom:
-      secretKeyRef:
-        name: rds-secret
-        key: password
+    - name: GF_DATABASE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: rds-secret
+          key: password
   grafana.ini:
     database:
       type: mysql
