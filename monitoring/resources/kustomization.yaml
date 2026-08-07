@@ -10,3 +10,5 @@ resources:
   - prometheus-rules.yaml
   # WAS가 /metrics를 제공할 때 사용할 선택적 ServiceMonitor를 등록한다.
   - servicemonitor-was.yaml
+  # Grafana에서 rds secret을 연결할 때 사용
+  - grafana-rds-secret.yaml
